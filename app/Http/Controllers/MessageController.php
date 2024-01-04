@@ -6,8 +6,11 @@ use App\Http\Requests\Complaint\StoreRequest;
 use App\Http\Requests\MessageStoreRequest;
 use App\Http\Requests\MessageUpdateRequest;
 use App\Http\Resources\MessageResource;
+use App\Models\Image;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MessageController extends Controller
@@ -36,13 +39,37 @@ class MessageController extends Controller
         $data = $request->validated();
         $data['user_id'] = Auth::id();
 
-        $ids = Str::of($data['content'])->matchAll('/@[\d]+/')->unique()->transform(
+        $answeredForUsersIds = Str::of($data['content'])->matchAll('/@[\d]+/')->unique()->transform(
             fn ($id) => Str::of($id)->replaceMatches('/@/', '')->value()
+        )->filter(
+            fn ($id) => User::query()->where('id', $id)->exists()
+        );
+
+        $imageIds = Str::of($data['content'])->matchAll('/img_id=[\d]+/')->unique()->transform(
+            fn ($id) => Str::of($id)->replaceMatches('/img_id=/', '')->value()
         );
 
         $message = Message::query()->create($data);
 
-        $message->answeredUsers()->attach($ids);
+        Image::query()->whereIn('id', $imageIds)->update([
+            'message_id' => $message->id
+        ]);
+
+        Image::query()
+            ->where('user_id', auth()->id())
+            ->whereNull('message_id')
+            ->get()
+            ->pluck('path')
+            ->each(function ($path) {
+                Storage::disk('public')->delete($path);
+            });
+
+        Image::query()
+            ->where('user_id', auth()->id())
+            ->whereNull('message_id')
+            ->delete();
+
+        $message->answeredUsers()->attach($answeredForUsersIds);
 
         $message->loadCount('likedUsers');
 
