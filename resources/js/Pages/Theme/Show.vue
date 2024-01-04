@@ -110,6 +110,7 @@ export default defineComponent({
                 v-for="message in theme.messages"
                 :key="message.id"
                 class="flex bg-white border border-gray-300"
+                :id="message.id"
             >
                 <div class="p-4 border-r border-gray-300 w-1/6 flex justify-center items-center flex-col">
                     <div class="w-24 h-24 bg-gray-100 rounded-full overflow-hidden mb-2">
