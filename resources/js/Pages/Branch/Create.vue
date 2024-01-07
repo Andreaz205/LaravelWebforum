@@ -48,11 +48,18 @@ export default defineComponent({
                      class="border-gray-300 p-2 w-1/4"
                  >
                      <option value="null" selected disabled>Выберите раздел</option>
-                     <option
-                         v-for="section in sections"
-                         :key="section.id"
-                         :value="section.id"
-                     >{{ section.title }}</option>
+
+                     <template v-for="section in sections">
+                         <template v-if="this.$page.props.auth.roles.some(code => [
+                                'editor',
+                                `editor.${section.id}`,
+                            ].includes(code))"
+                         >
+                             <option :value="section.id">
+                                 {{ section.title }}
+                             </option>
+                         </template>
+                     </template>
                  </select>
                  <div v-if="this.$page.props.errors.section_id" class="text-red-600 text-sm">
                      {{ this.$page.props.errors.section_id }}

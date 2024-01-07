@@ -6,6 +6,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 export default defineComponent({
     name: "Index",
     layout: AdminLayout,
+    props: ['roles'],
     components: {
         Link
     },
@@ -22,7 +23,22 @@ export default defineComponent({
         </div>
         <div>
             <div class="border border-gray-200 rounded-lg">
-
+                <table class="text-center w-full">
+                    <thead class="w-full bg-gray-100">
+                    <tr class="text-gray-700">
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Название</th>
+                        <th class="p-4">Код</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="role in roles" class="text-gray-500">
+                        <td class="p-4">{{ role.id }}</td>
+                        <td class="p-4">{{ role.title }}</td>
+                        <td class="p-4">{{ role.code }}</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

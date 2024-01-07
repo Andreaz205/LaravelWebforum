@@ -9,6 +9,7 @@ use App\Http\Resources\Branch\BranchWithChildrenResource;
 use App\Http\Resources\Section\SectionResource;
 use App\Models\Branch;
 use App\Models\Section;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class BranchController extends Controller
 {
@@ -54,9 +55,12 @@ class BranchController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     * @throws AuthorizationException
      */
     public function edit(Branch $branch)
     {
+        $this->authorize('update', $branch);
+
         $sections = Section::all();
 
         $sections = SectionResource::collection($sections)->resolve();
@@ -68,9 +72,12 @@ class BranchController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @throws AuthorizationException
      */
     public function update(UpdateRequest $request, Branch $branch)
     {
+        $this->authorize('update', $branch);
+
         $branch->update($request->validated());
 
         return redirect()->route('sections.index');
@@ -78,9 +85,12 @@ class BranchController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @throws AuthorizationException
      */
     public function destroy(Branch $branch)
     {
+        $this->authorize('delete', $branch);
+
         $branch->delete();
 
         return redirect()->route('sections.index');

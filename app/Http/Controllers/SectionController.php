@@ -9,6 +9,7 @@ use App\Http\Resources\Section\SectionResource;
 use App\Http\Resources\Section\SectionWithBranchesResource;
 use App\Models\Branch;
 use App\Models\Section;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class SectionController extends Controller
 {
@@ -17,26 +18,32 @@ class SectionController extends Controller
      */
     public function index()
     {
-        $sections = Section::query()->with('branches')->get();
-
-        $sections = SectionWithBranchesResource::collection($sections)->resolve();
+        $sections = SectionWithBranchesResource::collection(
+            Section::query()->with('branches')->get()
+        )->resolve();
 
         return inertia('Section/Index', compact('sections'));
     }
 
     /**
      * Show the form for creating a new resource.
+     * @throws AuthorizationException
      */
     public function create()
     {
+        $this->authorize('create', Section::class);
+
         return inertia('Section/Create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws AuthorizationException
      */
     public function store(StoreRequest $request)
     {
+        $this->authorize('create', Section::class);
+
         $data = $request->validated();
 
         Section::query()->firstOrCreate($data);
@@ -91,8 +98,8 @@ class SectionController extends Controller
 
     public function branchIndexExcept(Section $section, Branch $branch)
     {
-        $branches = Branch::query()->whereNot('id', $branch->id)->get();
-
-        return BranchResource::collection($branches)->resolve();
+        return BranchResource::collection(
+            $section->branches()->whereNot('id', $branch->id)->get()
+        )->resolve();
     }
 }

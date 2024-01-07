@@ -32,6 +32,9 @@ export default defineComponent({
                     <div>
                         <Link class="block p-4 w-full border-b border-gray-300" :href="route('admin.roles.index')">Роли</Link>
                     </div>
+                    <div>
+                        <Link class="block p-4 w-full border-b border-gray-300" :href="route('admin.users.index')">Пользователи</Link>
+                    </div>
                 </div>
             </div>
             <div class="w-3/4 bg-white p-4 border-gray-300 border">

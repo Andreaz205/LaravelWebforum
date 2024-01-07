@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\ThemeController;
@@ -58,14 +60,21 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/images', [ImageController::class, 'store'])->name('images.store');
 
-    Route::get('/admin', [MainController::class, 'index'])->name('admin.main.index');
+    Route::patch('/notifications/update_collection', [NotificationController::class, 'updateCollection'])
+        ->name('notifications.collection.update');
 
+    Route::get('/admin', [MainController::class, 'index'])
+        ->name('admin.main.index');
 
     Route::get('/admin/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
     Route::patch('/admin/complaints/{complaint}', [ComplaintController::class, 'update'])->name('admin.complaints.update');
 
     Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
     Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
+    Route::post('/admin/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+
+    Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users/{user}/roles', [AdminUserController::class, 'toggleRole'])->name('admin.users.roles');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

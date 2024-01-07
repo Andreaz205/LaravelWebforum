@@ -63,6 +63,7 @@ export default defineComponent({
                 })
                 message.body = ""
                 message.is_not_solved_complaint = response.data.is_not_solved_complaint
+
             } catch (e) {
                 alert(e.message)
             }
@@ -96,6 +97,19 @@ export default defineComponent({
 
             range.surroundContents(strong)
         }
+    },
+    created() {
+        window.Echo.channel(`themes.${this.theme.id}`)
+            .listen('.store_message', response => {
+                this.theme.messages.push(response.data)
+            })
+
+        window.Echo.channel(`themes.${this.theme.id}.likes`)
+            .listen('.store_like', response => {
+                this.theme.messages
+                    .filter(message => message.id === response.data.id)
+                    .forEach(message => message.likes = response.data.likes)
+            })
     }
 })
 </script>
